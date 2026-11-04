@@ -1,0 +1,908 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Compara Aê</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#EDF1F5;--surface:#fff;--ink:#0F1B2D;--muted:#566579;--line:#D3DCE6;
+  --gas:#2457C5;--eth:#16874A;--gas-bg:#E3ECFC;--eth-bg:#DDF3E7;--sign:#101A2C;--lamp:#FFC400;--sign-text:#AEBBCD;
+  color-scheme:light;
+  box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){--bg:#0A1119;--surface:#131D2B;--ink:#E7EDF5;--muted:#95A5BA;--line:#25324A;--gas:#7FA3F5;--eth:#52C98B;--gas-bg:#1A2B4D;--eth-bg:#143826;--sign:#04080D;color-scheme:dark}
+}
+:root[data-theme="dark"]{--bg:#0A1119;--surface:#131D2B;--ink:#E7EDF5;--muted:#95A5BA;--line:#25324A;--gas:#7FA3F5;--eth:#52C98B;--gas-bg:#1A2B4D;--eth-bg:#143826;--sign:#04080D;color-scheme:dark}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 16px/1.5 "DM Sans",system-ui,-apple-system,"Segoe UI",sans-serif}
+main{max-width:900px;margin:0 auto;padding:24px 16px 48px}
+h1,h2,.num{font-family:"Barlow Condensed","Arial Narrow",Impact,sans-serif;font-weight:700;letter-spacing:.2px}
+h1{font-size:40px;line-height:1.05;margin:0 0 4px}
+h2{font-size:26px;margin:0 0 12px;line-height:1.1}
+.lead{color:var(--muted);margin:0 0 20px;max-width:60ch}
+button,input,select{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--lamp);outline-offset:2px}
+.home-hero{margin:8px 0 28px}
+.hero-head{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.eyebrow{display:block;margin-bottom:8px;color:var(--gas);font-size:13px;font-weight:700;letter-spacing:.08em;text-transform:uppercase}
+.hero-dismiss{display:inline-flex;align-items:center;gap:5px;padding:6px 8px;border:0;border-radius:8px;background:transparent;color:var(--muted);font-size:13px;cursor:pointer}
+.hero-dismiss:hover{background:var(--surface);color:var(--ink)}
+.hero-dismiss svg{width:16px;height:16px;flex:none}
+.home-hero h1{max-width:18ch;margin-bottom:10px;font-size:clamp(36px,5vw,52px)}
+.home-hero .lead{margin-bottom:18px}
+.hero-actions{display:flex;flex-wrap:wrap;gap:10px}
+.hero-cta,.hero-secondary{display:inline-flex;align-items:center;justify-content:center;min-height:46px;padding:10px 18px;border-radius:10px;font-weight:700;text-decoration:none}
+.hero-cta{background:var(--lamp);color:#1A1400}
+.hero-cta:hover{filter:brightness(.95)}
+.hero-secondary{border:1px solid var(--line);background:var(--surface);color:var(--ink)}
+.hero-secondary:hover{background:var(--bg)}
+.section-title{margin:0 0 12px}
+.sign{margin-bottom:0}
+.board-section{margin-bottom:0}
+.verdict-bar{margin-top:12px}
+.home-note{color:var(--muted);font-size:13px;margin:12px 0 0}
+
+/* placa de preços */
+.sign{background:var(--sign);border-radius:16px;padding:20px;display:grid;grid-template-columns:1fr 1fr;gap:16px;border:4px solid #2A3750}
+.slot{min-width:0}
+.slot .name{display:flex;align-items:center;gap:8px;color:var(--sign-text);font-weight:500}
+.dot{width:12px;height:12px;border-radius:50%;flex:none}
+.slot .num{font-size:clamp(48px,11vw,84px);line-height:1;color:var(--lamp);margin:6px 0 4px;white-space:nowrap}
+.slot .where{color:#E7EDF5;font-weight:500;overflow-wrap:anywhere}
+.slot .when{color:var(--sign-text);font-size:14px}
+
+/* veredito */
+.verdict-bar{margin:16px 0 28px;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px;display:flex;flex-wrap:wrap;gap:12px 24px;align-items:center;justify-content:space-between}
+.verdict-bar .big{font-size:28px;line-height:1.1}
+.verdict-bar p{margin:2px 0 0;color:var(--muted);font-size:14px}
+.limit{display:flex;align-items:center;gap:8px;font-size:14px;color:var(--muted)}
+.limit input{width:72px;padding:8px;border:1px solid var(--line);border-radius:8px;background:var(--bg);text-align:center}
+.pos-eth{color:var(--eth)}.pos-gas{color:var(--gas)}
+
+/* lista */
+.head{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:end;gap:8px;margin-bottom:8px}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:10px;overflow:hidden;background:var(--surface)}
+.seg button{border:0;background:none;padding:8px 14px;cursor:pointer;min-height:40px}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--bg);font-weight:700}
+ul.list{list-style:none;margin:0;padding:0;display:grid;gap:10px}
+.row{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px;display:grid;grid-template-columns:1.2fr 1fr 1fr 1.1fr;gap:12px;align-items:center}
+.who strong{display:block;font-size:17px}
+.km{color:var(--muted);font-size:14px}
+.cell .lab{display:flex;align-items:center;gap:6px;color:var(--muted);font-size:14px}
+.cell .price{font-size:28px;line-height:1.1}
+.cell .age{font-size:13px;color:var(--muted)}
+.cell .age.old{color:#B3571A}
+.pill{display:inline-block;font-size:12px;font-weight:700;padding:1px 8px;border-radius:99px;margin-left:4px}
+.pill.gas{background:var(--gas-bg);color:var(--gas)}.pill.eth{background:var(--eth-bg);color:var(--eth)}
+.ok{margin-top:4px;border:1px solid var(--line);background:none;border-radius:8px;padding:4px 10px;cursor:pointer;font-size:13px;min-height:32px}
+.ok:hover{background:var(--bg)}.ok[disabled]{opacity:.6;cursor:default}
+.v{font-weight:700;font-size:15px;padding:8px 10px;border-radius:10px;text-align:center}
+.v.eth{background:var(--eth-bg);color:var(--eth)}.v.gas{background:var(--gas-bg);color:var(--gas)}.v.none{background:var(--bg);color:var(--muted);font-weight:500}
+@media (max-width:720px){
+  .sign{grid-template-columns:1fr;padding:16px}
+  .row{grid-template-columns:1fr 1fr}
+  .who,.v{grid-column:1/-1}
+  .home-hero{margin-top:0}
+  .home-hero h1{max-width:16ch}
+  .hero-actions{display:grid;grid-template-columns:1fr 1fr;gap:4px}
+  .hero-cta,.hero-secondary{padding:8px 10px;font-size:14px}
+  .hero-secondary{border-color:transparent;background:transparent}
+  .hero-secondary:hover{background:var(--surface)}
+}
+
+/* formulário */
+.form{margin-top:32px;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px}
+.fields{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;align-items:end}
+label{display:grid;gap:4px;font-size:14px;color:var(--muted)}
+label input,label select{padding:10px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink);min-height:44px;width:100%}
+.primary{background:var(--lamp);color:#1A1400;border:0;border-radius:10px;font-weight:700;padding:11px 18px;cursor:pointer;min-height:44px}
+.fine{color:var(--muted);font-size:13px;margin:12px 0 0}
+.link{background:none;border:0;color:var(--muted);text-decoration:underline;cursor:pointer;padding:0;font-size:13px}
+[hidden]{display:none!important}
+.top,.foot{background:var(--sign);color:#E7EDF5}
+.top{margin-top:calc(-1*env(safe-area-inset-top,0px));padding:calc(12px + env(safe-area-inset-top,0px)) 16px 12px;border-bottom:4px solid var(--lamp)}
+.bar{max-width:900px;margin:0 auto;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px 24px}
+.menu-toggle{display:none;align-items:center;justify-content:center;width:44px;height:44px;padding:0;border:1px solid #40506A;border-radius:10px;background:transparent;color:inherit;cursor:pointer}
+.menu-toggle svg{width:24px;height:24px}
+.sidebar{position:fixed;z-index:30;inset:0 auto 0 0;width:260px;padding:24px 16px;background:var(--surface);color:var(--ink);border-right:1px solid var(--line);transform:translateX(-105%);transition:transform .2s ease;overflow-y:auto}
+.sidebar-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:24px}
+.sidebar-head .brand{color:var(--ink)}
+.sidebar-head .brand small{color:var(--muted)}
+.sidebar-close{display:inline-flex;align-items:center;justify-content:center;width:40px;height:40px;border:1px solid var(--line);border-radius:10px;background:var(--bg);color:var(--ink);cursor:pointer}
+.sidebar-close svg{width:20px;height:20px}
+.sidebar nav{display:grid;gap:6px}
+.sidebar nav a{display:flex;align-items:center;gap:12px;padding:12px;border-radius:10px;color:var(--ink);text-decoration:none;font-weight:500}
+.sidebar nav a:hover,.sidebar nav a:focus-visible,.sidebar nav a[aria-current="page"]{background:var(--bg)}
+.sidebar nav svg{width:20px;height:20px;flex:none;color:var(--muted)}
+.menu-backdrop{position:fixed;z-index:20;inset:0;background:rgba(4,8,13,.55);display:none}
+body.menu-open .sidebar{transform:translateX(0)}
+.profile-card{margin:0 0 24px;padding:16px;background:var(--surface);border:1px solid var(--line);border-radius:12px}
+.profile-card h2{margin-bottom:6px}
+.profile-card p{margin:0;color:var(--muted)}
+.page-view{animation:rise .25s ease}
+.page-head{margin-bottom:24px}
+.page-head .back{margin-bottom:12px}
+.page-head .lead{margin-bottom:0}
+.page-card{margin:0 0 16px;padding:18px;background:var(--surface);border:1px solid var(--line);border-radius:12px}
+.page-card h2{margin-bottom:8px}
+.page-card p{margin:0;color:var(--muted)}
+.page-card + .page-card{margin-top:16px}
+.profile-form{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:12px;align-items:end;max-width:560px}
+.profile-form .primary{white-space:nowrap}
+.settings-fields{display:grid;gap:16px;max-width:560px}
+.settings-fields label{max-width:360px}
+.activity-summary{color:var(--muted);margin:0 0 14px}
+.activity-list{list-style:none;padding:0;margin:0;display:grid;gap:10px}
+.activity-list li{padding:14px;background:var(--surface);border:1px solid var(--line);border-radius:12px}
+.activity-list p{margin:0}
+.activity-list .km{display:block;margin-top:3px}
+.config-link{color:var(--gas);font-weight:700;text-decoration:none}
+.config-link:hover{text-decoration:underline}
+.brand{display:flex;align-items:center;gap:10px;color:inherit;text-decoration:none}
+.brand svg{width:40px;height:40px;flex:none}
+.brand b{font-family:"Barlow Condensed","Arial Narrow",Impact,sans-serif;font-size:28px;line-height:1;letter-spacing:.2px}
+.brand small{display:block;color:var(--sign-text);font-size:13px;line-height:1.2;margin-top:2px}
+.top nav{display:flex;gap:6px}
+.top nav a{color:inherit;padding:8px 14px;border-radius:99px;text-decoration:none;font-weight:500;min-height:40px;display:inline-flex;align-items:center}
+.top nav a:hover{background:#22304A}
+.foot{margin-bottom:calc(-1*env(safe-area-inset-bottom,0px));padding:28px 16px calc(20px + env(safe-area-inset-bottom,0px))}
+.foot .bar{align-items:flex-start}
+.foot h2{font-size:20px;margin:0 0 6px}
+.foot p{margin:6px 0 0;color:var(--sign-text);font-size:14px;max-width:40ch}
+.foot ul{list-style:none;margin:0;padding:0;display:grid;gap:2px}
+.foot a{color:inherit;display:inline-block;padding:4px 0}
+.foot .legal{max-width:900px;margin:20px auto 0;padding-top:14px;border-top:1px solid #2A3750;color:var(--sign-text);font-size:13px}
+/* movimento */
+.row{transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease}
+.row:hover{transform:translateY(-2px);border-color:var(--muted)}
+button{transition:background-color .15s,transform .1s,opacity .15s}
+.primary:active,.ok:active{transform:scale(.96)}
+.verdict-bar .big{transition:color .3s}
+.v{transition:background-color .3s,color .3s}
+@keyframes rise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.enter .row{animation:rise .4s ease backwards;animation-delay:calc(var(--i,0)*70ms)}
+@keyframes flash{0%{color:#fff;text-shadow:0 0 18px var(--lamp)}100%{color:var(--lamp);text-shadow:none}}
+.num.flash{animation:flash .8s ease}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(255,196,0,.8)}100%{box-shadow:0 0 0 14px rgba(255,196,0,0)}}
+.row.pulse{animation:pulse .9s ease-out}
+@keyframes shimmer{to{background-position:-200% 0}}
+.sk{background:linear-gradient(90deg,var(--line) 25%,var(--bg) 50%,var(--line) 75%);background-size:200% 100%;animation:shimmer 1.2s linear infinite;border-radius:8px;color:transparent!important;text-shadow:none}
+.sk-line{height:18px;margin:6px 0}
+.row.skel{pointer-events:none}
+.wl{display:flex;align-items:center;gap:12px;color:inherit;text-decoration:none}
+.wl:hover strong{text-decoration:underline}
+.logo{width:44px;height:44px;border-radius:12px;object-fit:cover;flex:none;background:var(--bg);border:1px solid var(--line)}
+.logo.ini{display:grid;place-items:center;font-family:"Barlow Condensed","Arial Narrow",sans-serif;font-weight:700;font-size:20px;color:var(--muted)}
+.logo.big{width:88px;height:88px;border-radius:18px;font-size:34px}
+.vb{width:18px;height:18px;vertical-align:-3px;margin-left:5px;flex:none}
+.dhead .vb{width:26px;height:26px;vertical-align:-2px}
+.vbtn{display:inline-flex;vertical-align:-3px;cursor:pointer;border-radius:50%}
+.dhead .vbtn{vertical-align:-2px}
+.st{width:18px;height:18px;vertical-align:-3px}
+.rate{margin-top:4px;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.mr{margin-left:8px;display:inline-flex;align-items:center;gap:3px;color:var(--ink);font-weight:500}
+.mr .st{width:14px;height:14px;vertical-align:0}
+.mine{display:flex;flex-wrap:wrap;align-items:center;gap:12px;margin-bottom:16px}
+.pick{display:inline-flex}
+.pick button{background:none;border:0;padding:2px;cursor:pointer;line-height:0;min-width:36px;min-height:36px}
+.pick .st{width:28px;height:28px;vertical-align:0}
+.pick:hover button svg path{fill:#F5A623}
+.pick button:hover~button svg path{fill:none}
+.cform{display:grid;gap:10px;margin-bottom:20px;max-width:560px}
+.cform .primary{justify-self:start}
+label textarea{padding:10px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink);width:100%;font:inherit;resize:vertical}
+.cms{list-style:none;margin:0;padding:0;display:grid;gap:14px}
+.cms li{display:flex;gap:12px}
+.cms p{margin:2px 0 0;overflow-wrap:anywhere}
+.cav{width:36px;height:36px;border-radius:50%;background:var(--gas-bg);color:var(--gas);display:grid;place-items:center;font-weight:700;flex:none}
+.rbar{margin-top:10px}
+.route{display:inline-flex;align-items:center;gap:8px;background:var(--lamp);color:#1A1400;border:0;border-radius:10px;font-weight:700;padding:10px 18px;min-height:44px;text-decoration:none;cursor:pointer}
+.route svg{width:18px;height:18px}
+.route:hover{filter:brightness(.94)}
+.route.off{opacity:.55}
+.sortwrap{display:grid;gap:4px}
+@media (max-width:720px){.sortwrap{width:100%}.seg{display:flex}.seg button{flex:1;padding:8px 6px;font-size:14px;line-height:1.2}}
+.foot .legal{display:flex;flex-wrap:wrap;justify-content:space-between;gap:6px 16px}
+#clock{font-variant-numeric:tabular-nums}
+@media (min-width:1000px){
+  body{padding-left:260px}
+  .sidebar{transform:none;padding-top:calc(24px + env(safe-area-inset-top,0px))}
+  .sidebar-close{display:none}
+}
+.who{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.route.mini{width:44px;height:44px;padding:0;justify-content:center;border-radius:50%;flex:none}
+.route.mini svg{width:20px;height:20px}
+.row .route.mini{background:var(--bg);color:var(--ink);border:1px solid var(--line)}
+.row .route.mini:hover{background:var(--lamp);color:#1A1400;filter:none}
+#tip{position:fixed;z-index:50;max-width:min(280px,calc(100vw - 24px));background:var(--ink);color:var(--bg);padding:10px 12px;border-radius:10px;font-size:14px;line-height:1.4;box-shadow:0 6px 24px rgba(0,0,0,.28);animation:rise .15s ease}
+.dhead{display:flex;align-items:center;gap:16px;margin:8px 0 20px}
+.dhead h1{margin:0}
+.picker{position:relative;cursor:pointer;display:block;flex:none;overflow:hidden;border-radius:18px}
+.picker .tag{position:absolute;left:0;right:0;bottom:0;background:rgba(16,26,44,.78);color:#fff;font-size:12px;text-align:center;padding:2px 0}
+.back{display:inline-flex;align-items:center;gap:6px;color:var(--muted);padding:8px 0;text-decoration:none;font-weight:500}
+.back svg{width:18px;height:18px;transition:transform .15s}
+.back:hover{color:var(--ink)}
+.back:hover svg{transform:translateX(-3px)}
+.fade{animation:rise .35s ease backwards}
+.dprices{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
+.dprices .cell{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:24px}
+label.chip{display:flex;flex-direction:row;align-items:center;gap:6px;border:1px solid var(--line);border-radius:99px;padding:6px 12px;background:var(--surface);color:var(--ink);cursor:pointer}
+label.chip input{width:auto;min-height:0;padding:0}
+.gal{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
+.gal figure{position:relative;margin:0}
+.gal img{width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:10px;display:block}
+.gal button{position:absolute;top:6px;right:6px;border:0;border-radius:99px;background:rgba(16,26,44,.8);color:#fff;width:28px;height:28px;cursor:pointer}
+label.add{aspect-ratio:4/3;border:2px dashed var(--line);border-radius:10px;display:grid;place-items:center;text-align:center;color:var(--muted);cursor:pointer;padding:8px}
+@keyframes rot{to{transform:rotate(360deg)}}
+.spin{display:inline-block;width:14px;height:14px;border:2px solid currentColor;border-right-color:transparent;border-radius:50%;animation:rot .7s linear infinite;vertical-align:-2px;margin-right:6px}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}.sk{animation:none}}
+.map{margin-left:8px;font-size:14px;color:var(--gas)}
+label.chk{display:flex;align-items:center;gap:8px}label.chk input{width:auto;min-height:0;padding:0}
+#toast{position:fixed;left:50%;transform:translateX(-50%) translateY(12px);bottom:calc(20px + env(safe-area-inset-bottom,0px));background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:10px;font-weight:500;opacity:0;pointer-events:none;transition:opacity .2s,transform .2s}
+#toast.on{opacity:1;transform:translateX(-50%)}
+@media (prefers-reduced-motion:reduce){#toast{transition:none}}
+@media (max-width:999px){
+  .menu-toggle{display:inline-flex;order:2}
+  .top nav{display:none}
+  .sidebar{padding-top:calc(16px + env(safe-area-inset-top,0px))}
+  body.menu-open .menu-backdrop{display:block}
+}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><symbol id="logo" viewBox="0 0 40 40"><rect width="40" height="40" rx="10" fill="#FFC400"/><path d="M12 30V11a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v19" fill="none" stroke="#101A2C" stroke-width="2.6" stroke-linecap="round"/><rect x="14.5" y="12.5" width="7" height="6" rx="1" fill="#101A2C"/><path d="M10 30h16M24 16h3a2 2 0 0 1 2 2v8a1.6 1.6 0 0 0 3.2 0v-9l-3-3" fill="none" stroke="#101A2C" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></symbol></svg>
+<aside class="sidebar" id="sidebar" aria-label="Menu lateral">
+  <div class="sidebar-head">
+    <a class="brand" href="#topo" aria-label="Compara Aê, início"><svg viewBox="0 0 40 40" aria-hidden="true"><use href="#logo"/></svg><span><b>Compara Aê</b><small>Menu principal</small></span></a>
+    <button class="sidebar-close" id="menuClose" type="button" aria-label="Fechar menu"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
+  </div>
+  <nav aria-label="Seções do site">
+    <a href="#perfil"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>Meu Perfil</a>
+    <a href="#configuracoes"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8Z"/><path d="m19.4 15 .1.1 1.1.9-1 1.7-1.4-.5a8 8 0 0 1-1.5.9l-.2 1.5h-2l-.4-1.4a8 8 0 0 1-1.8 0l-.8 1.2-1.8-.8.3-1.5a8 8 0 0 1-1.3-1.3l-1.5.3-.8-1.8 1.2-.8a8 8 0 0 1 0-1.8l-1.2-.8.8-1.8 1.5.3a8 8 0 0 1 1.3-1.3l-.3-1.5 1.8-.8.8 1.2a8 8 0 0 1 1.8 0l.8-1.2 1.8.8-.3 1.5a8 8 0 0 1 1.3 1.3l1.5-.3.8 1.8-1.2.8a8 8 0 0 1 0 1.8Z"/></svg>Configurações</a>
+    <a href="#contribuicoes"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20V10M18 20V4M6 20v-4"/></svg>Minhas Contribuições</a>
+    <a href="#sobre"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg>Sobre do site</a>
+  </nav>
+</aside>
+<div class="menu-backdrop" id="menuBackdrop"></div>
+<header class="top" id="topo"><div class="bar">
+  <a class="brand" href="#topo" aria-label="Compara Aê, início"><svg viewBox="0 0 40 40" aria-hidden="true"><use href="#logo"/></svg><span><b>Compara Aê</b><small>Compare gasolina e etanol</small></span></a>
+  <button class="menu-toggle" id="menuToggle" type="button" aria-label="Abrir menu" aria-controls="sidebar" aria-expanded="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button>
+  <nav aria-label="Principal"><a href="#postos">Postos</a><a href="#informar">Informar preço</a></nav>
+</div></header>
+<main>
+  <div id="detail" hidden></div>
+  <div id="home">
+  <section class="home-hero" id="homeHero" aria-labelledby="homeTitle">
+    <div class="hero-head">
+      <span class="eyebrow">Compara Aê · sua região</span>
+      <button class="hero-dismiss" id="dismissHero" type="button" aria-label="Dispensar chamada de apresentação">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="m18 6-12 12M6 6l12 12"/></svg>
+        Dispensar
+      </button>
+    </div>
+    <h1 id="homeTitle">Compare antes de abastecer</h1>
+    <p class="lead">Veja os menores preços informados pela comunidade e descubra se hoje vale mais a pena gasolina ou etanol.</p>
+    <div class="hero-actions">
+      <a class="hero-cta" href="#informar">Informar um preço</a>
+      <a class="hero-secondary" href="#postos">Ver postos próximos</a>
+    </div>
+  </section>
+
+  <section class="board-section" aria-labelledby="boardTitle">
+  <h2 class="section-title" id="boardTitle">Menores preços encontrados</h2>
+  <div class="sign" aria-label="Menores preços">
+    <div class="slot"><div class="name"><span class="dot" style="background:var(--gas)"></span>Menor preço da gasolina</div><div class="num" id="bGasP">—</div><div class="where" id="bGasW"></div><div class="when" id="bGasT"></div></div>
+    <div class="slot"><div class="name"><span class="dot" style="background:var(--eth)"></span>Menor preço do etanol</div><div class="num" id="bEthP">—</div><div class="where" id="bEthW"></div><div class="when" id="bEthT"></div></div>
+  </div>
+
+  <section class="verdict-bar" aria-label="Comparação de preços" aria-live="polite">
+    <div><div class="big num" id="vText">—</div><p id="vSub"></p></div>
+    <a class="config-link" href="#configuracoes">Ajustar comparação</a>
+  </section>
+  <p class="home-note">Os preços são informados pela comunidade. Confira o valor diretamente na bomba.</p>
+  </section>
+
+  <div class="head" id="postos">
+    <h2>Postos por perto</h2>
+    <button class="primary" id="locBtn" type="button">Usar minha localização</button>
+    <div class="sortwrap"><span id="sortLbl" class="km">Ordenar por</span><div class="seg" role="group" aria-labelledby="sortLbl">
+      <button data-sort="gas" aria-pressed="true">Gasolina mais barata</button>
+      <button data-sort="eth" aria-pressed="false">Etanol mais barato</button>
+      <button data-sort="km" aria-pressed="false">Mais perto</button></div>
+    </div>
+  </div>
+  <p class="fine" id="locMsg" style="margin:0 0 10px">Toque em “Usar minha localização” para ver a distância até cada posto. Sua posição não é salva nem enviada.</p>
+  <ul class="list" id="list"></ul>
+
+  <section class="form" id="informar" aria-labelledby="fTitle">
+    <h2 id="fTitle">Informar preço</h2>
+    <div class="fields">
+      <label>Posto<select id="fStation"></select></label>
+      <label id="newWrap" hidden>Nome do posto<input id="fNew" type="text" maxlength="40" placeholder="Ex.: Posto Primavera"></label>
+      <label class="chk" id="hereWrap" hidden><input id="fHere" type="checkbox" disabled> Estou neste posto agora (salvar a localização dele)</label>
+      <label>Gasolina (R$/L)<input id="fGas" type="text" inputmode="decimal" placeholder="6,29"></label>
+      <label>Etanol (R$/L)<input id="fEth" type="text" inputmode="decimal" placeholder="4,39"></label>
+      <button class="primary" id="send" type="button">Enviar preços</button>
+    </div>
+    <p class="fine">Preencha pelo menos um combustível. Os postos de exemplo são fictícios e o que você envia fica só neste navegador. Para salvar a localização de um posto novo, use primeiro “Usar minha localização”. <button class="link" id="reset" type="button">Restaurar exemplos</button> <button class="link" id="clearDemo" type="button">Remover exemplos</button></p>
+  </section>
+  </div>
+  <div id="pages" hidden>
+    <section class="page-view" id="page-perfil" hidden aria-labelledby="profileTitle">
+      <header class="page-head"><a class="back" href="#topo">← Início</a><h1 id="profileTitle">Meu Perfil</h1><p class="lead">Personalize como você aparece nas suas contribuições neste dispositivo.</p></header>
+      <div class="page-card">
+        <h2>Seu nome</h2>
+        <p>Esse nome é salvo apenas neste navegador e pode ser usado nos comentários que você publicar.</p>
+        <form class="profile-form" id="profileForm">
+          <label for="profileName">Nome de exibição<input id="profileName" name="profileName" type="text" maxlength="30" autocomplete="nickname" placeholder="Como quer aparecer"></label>
+          <button class="primary" type="submit">Salvar perfil</button>
+        </form>
+        <p class="fine" id="profileStatus" role="status"></p>
+      </div>
+      <div class="page-card"><h2>Privacidade</h2><p>Este protótipo não tem contas nem envia seu perfil para um servidor. Limpar os dados deste navegador remove o nome e o histórico local.</p></div>
+    </section>
+    <section class="page-view" id="page-configuracoes" hidden aria-labelledby="settingsTitle">
+      <header class="page-head"><a class="back" href="#topo">← Início</a><h1 id="settingsTitle">Configurações</h1><p class="lead">Ajuste a aparência e o critério usado na comparação dos combustíveis.</p></header>
+      <div class="page-card">
+        <h2>Preferências</h2>
+        <div class="settings-fields">
+          <label for="themeSelect">Aparência<select id="themeSelect"><option value="system">Usar aparência do dispositivo</option><option value="light">Claro</option><option value="dark">Escuro</option></select></label>
+          <label class="limit" for="limit">Etanol compensa até <input id="limit" type="number" min="50" max="90" step="1" value="70" inputmode="numeric" aria-label="Percentual limite do etanol sobre a gasolina">% do preço da gasolina</label>
+        </div>
+        <p class="fine">O limite pode ser ajustado entre 50% e 90% e é salvo neste navegador.</p>
+      </div>
+    </section>
+    <section class="page-view" id="page-contribuicoes" hidden aria-labelledby="contributionsTitle">
+      <header class="page-head"><a class="back" href="#topo">← Início</a><h1 id="contributionsTitle">Minhas Contribuições</h1><p class="lead">Veja as ações registradas neste navegador. Elas não são sincronizadas entre dispositivos.</p></header>
+      <p class="activity-summary" id="contributionsSummary"></p>
+      <ol class="activity-list" id="contributionsList"></ol>
+      <p class="fine"><a href="#informar">Informar um novo preço</a></p>
+    </section>
+    <section class="page-view" id="page-sobre" hidden aria-labelledby="aboutTitle">
+      <header class="page-head"><a class="back" href="#topo">← Início</a><h1 id="aboutTitle">Sobre do site</h1><p class="lead">Uma ferramenta comunitária para comparar preços de gasolina e etanol.</p></header>
+      <div class="page-card"><h2>Como funciona</h2><p>Os preços são informados por quem abasteceu. A comparação calcula a relação entre o menor preço do etanol e o menor preço da gasolina e aplica o limite escolhido em Configurações. Como referência inicial, o etanol costuma compensar quando custa até 70% do preço da gasolina.</p></div>
+      <div class="page-card"><h2>Dados e privacidade</h2><p>Este protótipo guarda preços, avaliações, preferências e contribuições no armazenamento local do navegador. Os postos de exemplo são fictícios. Confirme sempre o preço na bomba antes de abastecer.</p></div>
+    </section>
+  </div>
+</main>
+<footer class="foot" id="sobre">
+  <div class="bar">
+    <div>
+      <div class="brand"><svg viewBox="0 0 40 40" aria-hidden="true"><use href="#logo"/></svg><b>Compara Aê</b></div>
+      <p>Preços de combustível informados por quem abasteceu. Confira o valor na bomba antes de pagar.</p>
+    </div>
+    <div>
+      <h2>Navegue</h2>
+      <ul><li><a href="#postos">Postos por perto</a></li><li><a href="#informar">Informar preço</a></li><li><a href="#topo">Voltar ao topo</a></li></ul>
+    </div>
+    <div>
+      <h2>Sobre do site</h2>
+      <p>O Compara Aê ajuda a comparar preços de gasolina e etanol informados pela comunidade. O limite de comparação pode ser ajustado conforme o rendimento do seu carro.</p>
+    </div>
+  </div>
+  <div class="legal"><span>© 2026 Compara Aê. Protótipo com dados de exemplo.</span><span>Agora: <time id="clock"></time></span></div>
+</footer>
+<div id="tip" role="tooltip" hidden></div>
+<div id="toast" role="status"></div>
+
+<script>
+const KEY = 'precolitro:v2';
+const SETTINGS_KEY = 'precolitro:settings:v1';
+const PROFILE_KEY = 'precolitro:profile:v1';
+const CONTRIBUTIONS_KEY = 'precolitro:contributions:v1';
+const HERO_DISMISSED_KEY = 'precolitro:hero-dismissed';
+const $ = id => document.getElementById(id);
+const M = 60000;
+let stations, sortBy = 'gas', here = null, doAnim = false, touched = null;
+function readLocal(key, fallback){
+  try{
+    const raw = localStorage.getItem(key);
+    return raw ? JSON.parse(raw) : fallback;
+  }catch(e){ return fallback; }
+}
+function readSettings(){
+  const data = readLocal(SETTINGS_KEY, {});
+  const saved = data && typeof data === 'object' && !Array.isArray(data) ? data : {};
+  const theme = ['system','light','dark'].includes(saved.theme) ? saved.theme : 'system';
+  const value = Number(saved.limit);
+  return {theme, limit: Number.isFinite(value) ? Math.min(90, Math.max(50, value)) : 70};
+}
+function readProfile(){
+  const data = readLocal(PROFILE_KEY, {});
+  const saved = data && typeof data === 'object' && !Array.isArray(data) ? data : {};
+  return {name: typeof saved.name === 'string' ? saved.name.slice(0, 30) : ''};
+}
+function readContributions(){
+  const saved = readLocal(CONTRIBUTIONS_KEY, []);
+  if(!Array.isArray(saved)) return [];
+  return saved.filter(item => item && typeof item.detail === 'string' && typeof item.stationName === 'string' && Number.isFinite(item.time))
+    .slice(0, 500);
+}
+let settings = readSettings(), profile = readProfile(), contributionEvents = readContributions();
+function applyTheme(theme){
+  if(theme === 'system') document.documentElement.removeAttribute('data-theme');
+  else document.documentElement.setAttribute('data-theme', theme);
+}
+applyTheme(settings.theme);
+function saveSettings(){
+  try{ localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings)); return true; }
+  catch(e){ toast('Não foi possível salvar as configurações neste navegador.'); return false; }
+}
+function recordContribution(detail, station){
+  const entry = {detail, stationName: station.name, stationId: station.id, time: Date.now()};
+  const next = [entry, ...contributionEvents].slice(0, 500);
+  try{
+    localStorage.setItem(CONTRIBUTIONS_KEY, JSON.stringify(next));
+    contributionEvents = next;
+    return true;
+  }catch(e){
+    return false;
+  }
+}
+const menuToggle = $('menuToggle');
+function closeMenu(){
+  document.body.classList.remove('menu-open');
+  menuToggle.setAttribute('aria-expanded', 'false');
+  menuToggle.setAttribute('aria-label', 'Abrir menu');
+}
+menuToggle.addEventListener('click', () => {
+  const open = document.body.classList.toggle('menu-open');
+  menuToggle.setAttribute('aria-expanded', String(open));
+  menuToggle.setAttribute('aria-label', open ? 'Fechar menu' : 'Abrir menu');
+});
+$('menuClose').addEventListener('click', closeMenu);
+$('menuBackdrop').addEventListener('click', closeMenu);
+$('sidebar').addEventListener('click', e => {
+  if(e.target.closest('a')) closeMenu();
+});
+document.addEventListener('keydown', e => {
+  if(e.key === 'Escape') closeMenu();
+});
+
+function seed(){
+  const RT = {1:[120,28],2:[189,41],3:[46,12],4:[145,33],5:[16,5]}, D = 86400000, now = Date.now();
+  const CM = {1:[{n:'Marcos',x:'Atendimento rápido e bomba sempre funcionando.',t:now-3*D}],2:[{n:'Ana',x:'Preço bom e banheiro limpo. Voltarei.',t:now-D},{n:'Carlos',x:'Às vezes tem fila no fim da tarde.',t:now-5*D}]};
+  return seedList(now).map(s => ({...s, demo: true, rs: {sum: RT[s.id][0], n: RT[s.id][1]}, cm: CM[s.id] || []}));
+}
+function seedList(n){
+  return [
+    {id:1,name:'Posto Central',km:0.8,gas:{p:6.39,t:n-12*M,c:4},eth:{p:4.49,t:n-12*M,c:4}},
+    {id:2,name:'Auto Posto Beira Rio',km:1.6,gas:{p:6.19,t:n-95*M,c:7},eth:{p:4.39,t:n-95*M,c:6}},
+    {id:3,name:'Posto Vitória',km:2.3,gas:{p:6.55,t:n-40*M,c:2},eth:{p:4.29,t:n-40*M,c:3}},
+    {id:4,name:'Rede Estrada Real',km:3.4,gas:{p:6.09,t:n-300*M,c:5},eth:{p:4.35,t:n-300*M,c:5}},
+    {id:5,name:'Posto do Trevo',km:4.1,gas:{p:6.29,t:n-1800*M,c:1},eth:null}
+  ];
+}
+function load(){
+  try{
+    const s = localStorage.getItem(KEY);
+    if(s){
+      const d = JSON.parse(s), sd = seed();
+      d.forEach(x => { if(x.demo && !x.rs){ const m = sd.find(y => y.id === x.id); if(m){ x.rs = m.rs; x.cm = m.cm; } } });
+      return d;
+    }
+  }catch(e){}
+  return seed();
+}
+function save(){ try{ localStorage.setItem(KEY, JSON.stringify(stations)); return true; }catch(e){ return false; } }
+
+const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const brl = v => v == null ? '—' : v.toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
+const kmTxt = k => k == null ? 'distância não informada' : (k < 1 ? Math.round(k*1000) + ' m' : k.toLocaleString('pt-BR',{minimumFractionDigits:1,maximumFractionDigits:1}) + ' km');
+function distKm(s){
+  if(here && s.lat != null){
+    const r = Math.PI/180, dLat = (s.lat-here.lat)*r, dLng = (s.lng-here.lng)*r;
+    const a = Math.sin(dLat/2)**2 + Math.cos(here.lat*r)*Math.cos(s.lat*r)*Math.sin(dLng/2)**2;
+    return 12742*Math.asin(Math.sqrt(a));
+  }
+  return s.km == null ? null : s.km;
+}
+const distTxt = s => { const d = distKm(s); return kmTxt(d) + (s.demo && d != null ? ' · exemplo' : ''); };
+const mapLink = s => s.demo ? '' : `<a class="map" target="_blank" rel="noopener" href="https://www.google.com/maps/search/?api=1&amp;query=${s.lat != null ? s.lat + ',' + s.lng : encodeURIComponent(s.name)}">Ver no mapa</a>`;
+function ago(t){
+  const m = Math.round((Date.now()-t)/M);
+  if(m < 2) return 'agora há pouco';
+  if(m < 60) return 'há ' + m + ' min';
+  const h = Math.round(m/60);
+  return h < 24 ? 'há ' + h + ' h' : 'há ' + Math.round(h/24) + ' d';
+}
+const isOld = t => Date.now()-t > 24*60*M;
+const limit = () => Math.min(90, Math.max(50, parseFloat($('limit').value) || 70)) / 100;
+
+function cheapest(key){
+  let best = null;
+  stations.forEach(s => { const f = s[key]; if(f && (!best || f.p < best.f.p)) best = {s, f}; });
+  return best;
+}
+function verdict(g, e){
+  if(g == null || e == null) return null;
+  const r = e / g;
+  return {r, pct: Math.round(r*100), eth: r <= limit()};
+}
+
+function renderBoard(){
+  [['gas','bGas'],['eth','bEth']].forEach(([k,id]) => {
+    const b = cheapest(k);
+    const el = $(id+'P'), txt = b ? brl(b.f.p) : '—';
+    el.classList.remove('sk');
+    if(el.textContent !== txt){ el.textContent = txt; el.classList.remove('flash'); void el.offsetWidth; el.classList.add('flash'); }
+    $(id+'W').textContent = b ? b.s.name : 'Sem preços ainda';
+    $(id+'T').textContent = b ? distTxt(b.s) + ' · ' + ago(b.f.t) : '';
+  });
+  const g = cheapest('gas'), e = cheapest('eth');
+  const v = verdict(g && g.f.p, e && e.f.p);
+  const t = $('vText'), sub = $('vSub');
+  if(!v){ t.textContent = 'Faltam preços para comparar'; t.className = 'big num'; sub.textContent = ''; return; }
+  t.textContent = v.eth ? 'Hoje compensa abastecer com etanol' : 'Hoje compensa abastecer com gasolina';
+  t.className = 'big num ' + (v.eth ? 'pos-eth' : 'pos-gas');
+  sub.textContent = 'Nos menores preços, o etanol custa ' + v.pct + '% do preço da gasolina. O limite para compensar é ' + Math.round(limit()*100) + '%.';
+}
+
+function cell(s, key, label, minP){
+  const f = s[key];
+  const cls = key;
+  if(!f) return `<div class="cell"><div class="lab"><span class="dot" style="background:var(--${cls})"></span>${label}</div><div class="price num">—</div><div class="age">Sem preço informado</div></div>`;
+  const best = minP != null && f.p === minP ? `<span class="pill ${cls}">menor preço</span>` : '';
+  return `<div class="cell"><div class="lab"><span class="dot" style="background:var(--${cls})"></span>${label}${best}</div>
+    <div class="price num">${brl(f.p)}</div>
+    <div class="age ${isOld(f.t)?'old':''}">${ago(f.t)}${isOld(f.t)?' · pode estar desatualizado':''}</div>
+    <button class="ok" data-ok="${s.id}:${key}" aria-label="Confirmar preço de ${label.toLowerCase()} em ${esc(s.name)}">Confere · ${f.c}</button></div>`;
+}
+
+function renderList(){
+  $('list').classList.toggle('enter', doAnim); doAnim = false;
+  const t = touched; touched = null;
+  const val = s => sortBy === 'km' ? distKm(s) : (s[sortBy] ? s[sortBy].p : null);
+  const sorted = [...stations].sort((a,b) => {
+    const x = val(a), y = val(b);
+    if(x == null && y == null) return 0;
+    if(x == null) return 1;
+    if(y == null) return -1;
+    return x - y;
+  });
+  const minG = cheapest('gas'), minE = cheapest('eth');
+  $('list').innerHTML = sorted.map((s, i) => {
+    const v = verdict(s.gas && s.gas.p, s.eth && s.eth.p);
+    const vt = v ? `<div class="v ${v.eth?'eth':'gas'}">${v.eth?'Etanol compensa':'Gasolina compensa'} · ${v.pct}%</div>` : `<div class="v none">Faltam preços para comparar</div>`;
+    return `<li class="row${s.id === t ? ' pulse' : ''}" style="--i:${i}"><div class="who"><a class="wl" href="#posto-${s.id}">${logoHtml(s)}<span><strong>${esc(s.name)}${badge(s)}</strong><span class="km">${distTxt(s)}</span>${miniRate(s)}</span></a>${routeBtn(s, true)}</div>
+      ${cell(s,'gas','Gasolina', minG && minG.f.p)}${cell(s,'eth','Etanol', minE && minE.f.p)}${vt}</li>`;
+  }).join('') || '<li class="fine">Nenhum posto ainda. Cadastre o primeiro em “Informar preço”.</li>';
+  $('fStation').innerHTML = stations.map(s => `<option value="${s.id}">${esc(s.name)}</option>`).join('') + '<option value="new">Outro posto…</option>';
+  syncNew();
+}
+function skeleton(){
+  ['bGasP','bEthP'].forEach(id => { $(id).textContent = '0,00'; $(id).classList.add('sk'); });
+  ['bGasW','bEthW'].forEach(id => { $(id).innerHTML = '<div class="sk sk-line" style="width:60%"></div>'; });
+  ['bGasT','bEthT'].forEach(id => { $(id).textContent = ''; });
+  $('vText').textContent = 'Calculando…'; $('vSub').textContent = '';
+  $('send').disabled = true;
+  $('list').innerHTML = [1,2,3,4].map(() => '<li class="row skel"><div class="who"><div class="sk sk-line" style="width:70%"></div><div class="sk sk-line" style="width:40%"></div></div><div class="cell"><div class="sk sk-line" style="width:80%;height:30px"></div></div><div class="cell"><div class="sk sk-line" style="width:80%;height:30px"></div></div><div class="sk" style="height:38px"></div></li>').join('');
+}
+function render(){ $('send').disabled = false; renderBoard(); renderList(); }
+function renderContributions(){
+  const summary = $('contributionsSummary'), list = $('contributionsList');
+  summary.textContent = contributionEvents.length + (contributionEvents.length === 1 ? ' contribuição registrada' : ' contribuições registradas');
+  list.innerHTML = contributionEvents.length ? contributionEvents.map(item => {
+    const station = stations.find(s => String(s.id) === String(item.stationId));
+    const stationName = station ? `<a href="#posto-${encodeURIComponent(station.id)}">${esc(item.stationName)}</a>` : esc(item.stationName);
+    const date = new Date(item.time);
+    return `<li><p><strong>${esc(item.detail)}</strong></p><span class="km">${stationName} · <time datetime="${date.toISOString()}">${date.toLocaleString('pt-BR')}</time></span></li>`;
+  }).join('') : '<li class="fine">Ainda não há contribuições neste navegador. Seus preços, confirmações, avaliações e comentários aparecerão aqui.</li>';
+}
+function renderProfile(){
+  $('profileName').value = profile.name;
+  $('profileStatus').textContent = profile.name ? 'Seu perfil local está salvo como “' + profile.name + '”.' : 'Você ainda não definiu um nome de exibição.';
+}
+
+let tt;
+function toast(msg){ const t = $('toast'); t.textContent = msg; t.classList.add('on'); clearTimeout(tt); tt = setTimeout(() => t.classList.remove('on'), 2400); }
+try{
+  if(sessionStorage.getItem(HERO_DISMISSED_KEY) === 'true') $('homeHero').hidden = true;
+}catch(e){
+  toast('Não foi possível restaurar as preferências desta sessão.');
+}
+$('dismissHero').addEventListener('click', () => {
+  $('homeHero').hidden = true;
+  try{
+    sessionStorage.setItem(HERO_DISMISSED_KEY, 'true');
+    toast('Chamada dispensada até o fim desta sessão.');
+  }catch(e){
+    toast('Chamada dispensada, mas a preferência não será mantida após recarregar a página.');
+  }
+});
+const parsePrice = v => { const n = parseFloat(String(v).replace(',', '.')); return isFinite(n) ? n : null; };
+
+function route(){
+  const hash = location.hash;
+  const m = hash.match(/^#posto-(\d+)$/), s = m && stations.find(x => x.id == m[1]);
+  const page = {'#perfil':'page-perfil','#configuracoes':'page-configuracoes','#contribuicoes':'page-contribuicoes','#sobre':'page-sobre'}[hash];
+  $('home').hidden = !!s || !!page;
+  $('detail').hidden = !s;
+  $('pages').hidden = !!s || !page;
+  document.querySelectorAll('.page-view').forEach(el => { el.hidden = el.id !== page; });
+  document.querySelectorAll('.sidebar nav a').forEach(link => {
+    if(link.getAttribute('href') === hash) link.setAttribute('aria-current', 'page');
+    else link.removeAttribute('aria-current');
+  });
+  if(s){ showDetail(s); window.scrollTo(0, 0); return; }
+  if(page){
+    if(page === 'page-perfil') renderProfile();
+    if(page === 'page-contribuicoes') renderContributions();
+    window.scrollTo(0, 0);
+    return;
+  }
+  if(ready) render();
+  const t = hash.length > 1 && document.getElementById(hash.slice(1));
+  if(t) t.scrollIntoView();
+}
+
+$('list').addEventListener('click', e => {
+  if(e.target.closest('[data-demo-route]')){ toast('Posto de exemplo: cadastre um posto real para traçar rota'); return; }
+  const b = e.target.closest('[data-ok]'); if(!b) return;
+  const [id, key] = b.dataset.ok.split(':');
+  const s = stations.find(x => x.id == id);
+  if(s && s[key]){
+    const previous = {...s[key]};
+    s[key].c++; s[key].t = Date.now();
+    if(!save()){ s[key] = previous; toast('Não foi possível salvar a confirmação.'); return; }
+    const logged = recordContribution('Confirmou o preço de ' + (key === 'gas' ? 'gasolina' : 'etanol'), s);
+    touched = s.id; render(); toast(logged ? 'Preço confirmado' : 'Preço confirmado, mas não entrou no histórico');
+  }
+});
+document.querySelectorAll('[data-sort]').forEach(b => b.addEventListener('click', () => {
+  sortBy = b.dataset.sort;
+  document.querySelectorAll('[data-sort]').forEach(x => x.setAttribute('aria-pressed', x === b));
+  if(sortBy === 'km' && !here) toast('Use sua localização para ver as distâncias reais');
+  doAnim = true; renderList();
+}));
+$('limit').value = settings.limit;
+$('limit').addEventListener('input', () => {
+  const value = Number($('limit').value);
+  if(Number.isFinite(value)){
+    const previous = settings.limit;
+    settings.limit = Math.min(90, Math.max(50, value));
+    if(!saveSettings()){ settings.limit = previous; $('limit').value = previous; }
+  }
+  render();
+});
+$('themeSelect').value = settings.theme;
+$('themeSelect').addEventListener('change', () => {
+  const previous = settings.theme;
+  settings.theme = $('themeSelect').value;
+  applyTheme(settings.theme);
+  if(!saveSettings()){ settings.theme = previous; $('themeSelect').value = previous; applyTheme(previous); }
+});
+$('profileForm').addEventListener('submit', e => {
+  e.preventDefault();
+  const previous = profile;
+  profile = {name: $('profileName').value.trim().slice(0, 30)};
+  try{
+    localStorage.setItem(PROFILE_KEY, JSON.stringify(profile));
+    renderProfile();
+    toast('Perfil salvo neste navegador.');
+  }catch(err){
+    profile = previous;
+    renderProfile();
+    toast('Não foi possível salvar o perfil neste navegador.');
+  }
+});
+function syncNew(){ const n = $('fStation').value === 'new'; $('newWrap').hidden = !n; $('hereWrap').hidden = !n; $('fHere').disabled = !here; }
+$('fStation').addEventListener('change', syncNew);
+$('send').addEventListener('click', () => {
+  const g = parsePrice($('fGas').value), e = parsePrice($('fEth').value);
+  const bad = v => v != null && (v < 2 || v > 15);
+  if(g == null && e == null){ toast('Informe o preço de pelo menos um combustível'); return; }
+  if(bad(g) || bad(e)){ toast('Use preços entre R$ 2,00 e R$ 15,00'); return; }
+  const previous = JSON.parse(JSON.stringify(stations));
+  let s;
+  if($('fStation').value === 'new'){
+    const name = $('fNew').value.trim();
+    if(!name){ toast('Digite o nome do posto'); return; }
+    s = {id: Date.now(), name, km: null, gas: null, eth: null};
+    if($('fHere').checked && here){ s.lat = here.lat; s.lng = here.lng; }
+    stations.push(s);
+  } else { s = stations.find(x => x.id == $('fStation').value); }
+  if(!s){ toast('Selecione um posto válido.'); return; }
+  const now = Date.now();
+  if(g != null) s.gas = {p: g, t: now, c: 1};
+  if(e != null) s.eth = {p: e, t: now, c: 1};
+  if(!save()){ stations = previous; render(); toast('Não foi possível salvar os preços neste navegador.'); return; }
+  let historySaved = true;
+  if(g != null) historySaved = recordContribution('Informou gasolina: ' + brl(g), s) && historySaved;
+  if(e != null) historySaved = recordContribution('Informou etanol: ' + brl(e), s) && historySaved;
+  $('fGas').value = ''; $('fEth').value = ''; $('fNew').value = ''; $('fHere').checked = false;
+  touched = s.id; render(); toast(historySaved ? 'Preços enviados' : 'Preços enviados, mas o histórico não foi salvo');
+});
+$('reset').addEventListener('click', () => { stations = seed(); save(); render(); toast('Exemplos restaurados'); });
+
+$('clearDemo').addEventListener('click', () => { stations = stations.filter(s => !s.demo); save(); render(); toast('Exemplos removidos'); });
+$('locBtn').addEventListener('click', () => {
+  const msg = $('locMsg');
+  if(!navigator.geolocation){ msg.textContent = 'Este navegador não oferece localização.'; return; }
+  msg.textContent = 'Buscando sua localização…';
+  $('locBtn').disabled = true; $('locBtn').innerHTML = '<span class="spin"></span>Buscando…'; skeleton();
+  navigator.geolocation.getCurrentPosition(p => {
+    here = {lat: p.coords.latitude, lng: p.coords.longitude};
+    $('locBtn').disabled = false; $('locBtn').textContent = 'Atualizar localização'; doAnim = true;
+    msg.textContent = 'Distâncias em linha reta a partir da sua posição. Postos de exemplo não têm localização real.';
+    render();
+  }, err => {
+    $('locBtn').disabled = false; $('locBtn').textContent = here ? 'Atualizar localização' : 'Usar minha localização'; render();
+    msg.textContent = err.code === 1 ? 'Localização bloqueada. Libere o acesso no navegador para ver as distâncias.' : 'Não foi possível obter sua localização aqui. Tente abrir a página em uma aba própria.';
+  }, {enableHighAccuracy: true, timeout: 10000, maximumAge: 60000});
+});
+
+const VER = 10;
+const confirms = s => ((s.gas && s.gas.c) || 0) + ((s.eth && s.eth.c) || 0);
+const verified = s => confirms(s) >= VER;
+const badge = s => verified(s) ? '<span class="vbtn" role="button" tabindex="0" aria-label="Posto verificado. Toque para saber mais"><svg class="vb" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 1.8l2.6 1.9 3.2-.1 1 3.1 2.6 1.9-1 3.1 1 3.1-2.6 1.9-1 3.1-3.2-.1L12 22.2l-2.6-1.9-3.2.1-1-3.1-2.6-1.9 1-3.1-1-3.1 2.6-1.9 1-3.1 3.2.1z" fill="#1D9BF0"/><path d="M8 12.3l2.8 2.8 5.4-5.5" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>' : '';
+const fmt1 = n => n.toLocaleString('pt-BR',{minimumFractionDigits:1,maximumFractionDigits:1});
+const avg = s => s.rs && s.rs.n ? s.rs.sum / s.rs.n : null;
+const star = on => '<svg class="st" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5l2.9 6.1 6.6.8-4.9 4.6 1.3 6.6L12 17.3 6.1 20.6l1.3-6.6L2.5 9.4l6.6-.8z" fill="' + (on ? '#F5A623' : 'none') + '" stroke="#F5A623" stroke-width="1.6" stroke-linejoin="round"/></svg>';
+const miniRate = s => avg(s) == null ? '' : '<span class="mr">' + star(true) + fmt1(avg(s)) + '</span>';
+function avgHtml(s){
+  const a = avg(s);
+  if(a == null) return '<span class="km">Sem avaliações ainda</span>';
+  return [1,2,3,4,5].map(i => star(i <= Math.round(a))).join('') + ' <b>' + fmt1(a) + '</b> <span class="km">(' + s.rs.n + ' avaliações)</span>';
+}
+function reviewsHtml(s){
+  const cm = [...(s.cm || [])].sort((a, b) => b.t - a.t);
+  return `<h2 style="margin-top:28px">Avaliações e comentários</h2>
+  <div class="mine"><span>${s.mine ? 'Sua avaliação' : 'Avalie este posto'}</span>
+    <div class="pick" role="radiogroup" aria-label="Sua nota de 1 a 5">${[1,2,3,4,5].map(i => `<button type="button" role="radio" aria-checked="${s.mine === i}" aria-label="${i} ${i === 1 ? 'estrela' : 'estrelas'}" data-star="${i}">${star(i <= (s.mine || 0))}</button>`).join('')}</div></div>
+  <div class="cform"><label>Seu nome (opcional)<input id="cName" maxlength="30" placeholder="Como quer aparecer" value="${esc(profile.name)}"></label>
+    <label>Comentário<textarea id="cText" maxlength="300" rows="3" placeholder="Conte como foi abastecer aqui"></textarea></label>
+    <button class="primary" id="cSend" type="button">Publicar comentário</button></div>
+  <ul class="cms">${cm.length ? cm.map(c => `<li><div class="cav" aria-hidden="true">${esc((c.n || 'V')[0].toUpperCase())}</div><div><b>${esc(c.n || 'Visitante')}</b> <span class="km">${ago(c.t)}</span><p>${esc(c.x)}</p></div></li>`).join('') : '<li class="fine">Nenhum comentário ainda. Seja a primeira pessoa a comentar.</li>'}</ul>`;
+}
+const routeBtn = (s, mini) => {
+  const ico = '<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l18-8-8 18-2-8z"/></svg>';
+  if(s.demo) return '<button type="button" class="route off' + (mini ? ' mini' : '') + '" data-demo-route aria-label="Rotas (posto de exemplo)" title="Rotas">' + ico + (mini ? '' : 'Rotas') + '</button>';
+  const dest = s.lat != null ? s.lat + ',' + s.lng : encodeURIComponent(s.name + (s.addr ? ', ' + s.addr : ''));
+  return '<a class="route' + (mini ? ' mini' : '') + '" target="_blank" rel="noopener" aria-label="Rotas até ' + esc(s.name) + '" title="Rotas" href="https://www.google.com/maps/dir/?api=1&amp;destination=' + dest + '&amp;travelmode=driving">' + ico + (mini ? '' : 'Rotas') + '</a>';
+};
+const SERV = ['Loja de conveniência','Calibragem','Troca de óleo','Lavagem','Banheiro','Caixa eletrônico','Aceita Pix'];
+let ready = false;
+function logoHtml(s, big){
+  const c = 'logo' + (big ? ' big' : '');
+  if(s.logo) return `<img class="${c}" src="${s.logo}" alt="">`;
+  const ini = s.name.split(/\s+/).filter(w => w.length > 2).slice(0,2).map(w => w[0]).join('').toUpperCase() || s.name[0].toUpperCase();
+  return `<span class="${c} ini" aria-hidden="true">${esc(ini)}</span>`;
+}
+function toUrl(file, max, type, q){
+  return new Promise((res, rej) => {
+    const img = new Image(), u = URL.createObjectURL(file);
+    img.onload = () => {
+      const k = Math.min(1, max / Math.max(img.width, img.height)), c = document.createElement('canvas');
+      c.width = Math.round(img.width * k); c.height = Math.round(img.height * k);
+      c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+      URL.revokeObjectURL(u); res(c.toDataURL(type, q));
+    };
+    img.onerror = () => { URL.revokeObjectURL(u); rej(new Error('img')); };
+    img.src = u;
+  });
+}
+function showDetail(s){
+  const v = verdict(s.gas && s.gas.p, s.eth && s.eth.p), ph = s.photos || [], sv = s.serv || [];
+  const info = (k, label, hint) => `<label>${label}<input data-info="${k}" maxlength="80" placeholder="${hint}" value="${esc(s[k] || '')}"></label>`;
+  $('detail').innerHTML = `<div class="fade">
+  <a class="back" href="#postos"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5M11 6l-6 6 6 6"/></svg>Voltar aos postos</a>
+  <div class="dhead"><label class="picker" aria-label="Trocar logo do posto">${logoHtml(s, true)}<span class="tag">Trocar</span><input type="file" accept="image/*" data-logo hidden></label>
+    <div><h1>${esc(s.name)}${badge(s)}</h1><span class="km">${distTxt(s)}</span>${mapLink(s)}<div class="rate">${avgHtml(s)}</div><div class="rbar">${routeBtn(s)}</div></div></div>
+  ${s.demo ? '<p class="fine">Posto de exemplo (fictício). Cadastre um posto real em “Informar preço”.</p>' : ''}
+  ${verified(s) ? '' : '<p class="fine">Faltam ' + (VER - confirms(s)) + ' confirmações para este posto ser verificado.</p>'}
+  <div class="dprices">${cell(s,'gas','Gasolina',null)}${cell(s,'eth','Etanol',null)}</div>
+  ${v ? `<div class="v ${v.eth ? 'eth' : 'gas'}">${v.eth ? 'Etanol compensa' : 'Gasolina compensa'} · ${v.pct}%</div>` : ''}
+  <h2 style="margin-top:28px">Informações</h2>
+  <div class="fields" style="margin-bottom:24px">${info('addr','Endereço','Rua, número, bairro')}${info('hours','Horário','Ex.: 24 horas')}${info('tel','Telefone','(00) 00000-0000')}</div>
+  <h2>Serviços</h2>
+  <div class="chips">${SERV.map((n, i) => `<label class="chip"><input type="checkbox" data-serv="${i}"${sv.includes(n) ? ' checked' : ''}>${n}</label>`).join('')}</div>
+  <h2>Fotos</h2>
+  <div class="gal">${ph.map((p, i) => `<figure><img src="${p}" alt="Foto ${i+1} de ${esc(s.name)}" loading="lazy"><button type="button" data-rm="${i}" aria-label="Remover foto ${i+1}">×</button></figure>`).join('')}${ph.length < 6 ? '<label class="add">Adicionar foto<input type="file" accept="image/*" data-photo hidden></label>' : ''}</div>
+  ${reviewsHtml(s)}</div>`;
+}
+const curStation = () => stations.find(x => x.id == location.hash.slice(7));
+$('detail').addEventListener('click', e => {
+  const s = curStation(); if(!s) return;
+  const ok = e.target.closest('[data-ok]'), rm = e.target.closest('[data-rm]'), st = e.target.closest('[data-star]');
+  if(ok){
+    const k = ok.dataset.ok.split(':')[1];
+    if(s[k]){
+      const previous = {...s[k]};
+      s[k].c++; s[k].t = Date.now();
+      if(!save()){ s[k] = previous; toast('Não foi possível salvar a confirmação.'); return; }
+      const logged = recordContribution('Confirmou o preço de ' + (k === 'gas' ? 'gasolina' : 'etanol'), s);
+      showDetail(s); toast(logged ? 'Preço confirmado' : 'Preço confirmado, mas não entrou no histórico');
+    }
+  }
+  else if(rm){ (s.photos || []).splice(+rm.dataset.rm, 1); save(); showDetail(s); toast('Foto removida'); }
+  else if(st){
+    const previous = JSON.parse(JSON.stringify(s));
+    const v = +st.dataset.star; s.rs = s.rs || {sum: 0, n: 0};
+    if(s.mine) s.rs.sum += v - s.mine; else { s.rs.sum += v; s.rs.n++; }
+    s.mine = v;
+    if(!save()){
+      Object.keys(s).forEach(key => { if(!(key in previous)) delete s[key]; });
+      Object.assign(s, previous);
+      toast('Não foi possível salvar sua avaliação.');
+      return;
+    }
+    const logged = recordContribution('Avaliou o posto com ' + v + (v === 1 ? ' estrela' : ' estrelas'), s);
+    showDetail(s); toast(logged ? 'Avaliação enviada' : 'Avaliação enviada, mas não entrou no histórico');
+  }
+  else if(e.target.closest('[data-demo-route]')){ toast('Posto de exemplo: cadastre um posto real para traçar rota'); }
+  else if(e.target.id === 'cSend'){
+    const x = $('cText').value.trim();
+    if(!x){ toast('Escreva um comentário'); return; }
+    const name = $('cName').value.trim() || profile.name;
+    s.cm = s.cm || []; s.cm.push({n: name, x, t: Date.now()});
+    if(!save()){ s.cm.pop(); toast('Sem espaço no navegador'); return; }
+    const logged = recordContribution('Publicou um comentário', s);
+    showDetail(s); toast(logged ? 'Comentário publicado' : 'Comentário publicado, mas não entrou no histórico');
+  }
+});
+$('detail').addEventListener('change', async e => {
+  const t = e.target, s = curStation(); if(!s) return;
+  if(t.dataset.info){ s[t.dataset.info] = t.value.trim(); save(); return; }
+  if('serv' in t.dataset){ const n = SERV[+t.dataset.serv], cur = s.serv || []; s.serv = t.checked ? [...new Set([...cur, n])] : cur.filter(x => x !== n); save(); return; }
+  if(t.files && t.files[0]){
+    const f = t.files[0]; t.value = '';
+    try{
+      if('logo' in t.dataset){
+        const old = s.logo; s.logo = await toUrl(f, 160, 'image/png');
+        if(!save()){ s.logo = old; toast('Sem espaço no navegador para essa imagem'); return; }
+      } else {
+        s.photos = s.photos || [];
+        if(s.photos.length >= 6){ toast('Limite de 6 fotos por posto'); return; }
+        s.photos.push(await toUrl(f, 900, 'image/jpeg', 0.72));
+        if(!save()){ s.photos.pop(); toast('Sem espaço no navegador para essa imagem'); return; }
+      }
+      showDetail(s); toast('Imagem adicionada');
+    }catch(err){ toast('Não foi possível ler essa imagem'); }
+  }
+});
+const tip = $('tip'); let tipOwner = null, tipSticky = false;
+function showTip(el){
+  tip.textContent = 'Verificado: os preços deste posto foram confirmados por ' + VER + ' ou mais pessoas.';
+  tip.hidden = false;
+  const r = el.getBoundingClientRect(), w = tip.offsetWidth, h = tip.offsetHeight;
+  const x = Math.max(12, Math.min(r.left + r.width / 2 - w / 2, innerWidth - w - 12));
+  let y = r.bottom + 8; if(y + h > innerHeight - 12) y = r.top - h - 8;
+  tip.style.left = x + 'px'; tip.style.top = y + 'px'; tipOwner = el;
+}
+function hideTip(){ tip.hidden = true; tipOwner = null; tipSticky = false; }
+document.addEventListener('mouseover', e => { const b = e.target.closest('.vbtn'); if(b && !tipSticky && tipOwner !== b) showTip(b); });
+document.addEventListener('mouseout', e => { if(e.target.closest('.vbtn') && !tipSticky) hideTip(); });
+document.addEventListener('click', e => {
+  const b = e.target.closest('.vbtn');
+  if(b){ e.preventDefault(); if(tipSticky && tipOwner === b) hideTip(); else { tipSticky = true; showTip(b); } }
+  else hideTip();
+});
+document.addEventListener('keydown', e => {
+  if(e.key === 'Escape') hideTip();
+  const b = e.target.closest && e.target.closest('.vbtn');
+  if(b && (e.key === 'Enter' || e.key === ' ')){ e.preventDefault(); b.click(); }
+});
+const clock = $('clock');
+function tick(){
+  const d = new Date();
+  clock.dateTime = d.toISOString();
+  clock.textContent = d.toLocaleDateString('pt-BR', {weekday: 'long', day: 'numeric', month: 'long'}) + ', ' + d.toLocaleTimeString('pt-BR');
+}
+tick(); setInterval(tick, 1000);
+window.addEventListener('scroll', hideTip, {passive: true});
+window.addEventListener('hashchange', hideTip);
+window.addEventListener('hashchange', route);
+
+stations = load();
+skeleton();
+setTimeout(() => { ready = true; doAnim = true; render(); }, 650);
+route();
+</script>
+</body>
+</html>
